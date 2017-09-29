@@ -10,6 +10,10 @@ function isFunction(obj) {
     return !!(obj && obj.constructor && obj.call && obj.apply);
 };
 
+CameraPreview.getLux = function(onSuccess, onError) {
+    exec(onSuccess, onError, PLUGIN_NAME, "getLux");
+};
+
 CameraPreview.startCamera = function(options, onSuccess, onError) {
     options = options || {};
     options.x = options.x || 0;
