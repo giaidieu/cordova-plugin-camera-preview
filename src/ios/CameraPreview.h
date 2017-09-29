@@ -41,6 +41,9 @@
 
 - (void) invokeTapToFocus:(CGPoint) point;
 
+// Add by Tuan.
+- (void) getLux:(CDVInvokedUrlCommand*)command;
+
 @property (nonatomic) CameraSessionManager *sessionManager;
 @property (nonatomic) CameraRenderController *cameraRenderController;
 @property (nonatomic) NSString *onPictureTakenHandlerId;
