@@ -159,6 +159,30 @@
 
 -(void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
   if ([self.renderLock tryLock]) {
+    // Get lux.
+    CVPixelBufferRef pixelBuffer = (CVPixelBufferRef)CMSampleBufferGetImageBuffer(sampleBuffer);
+    CIImage *image = [CIImage imageWithCVPixelBuffer:pixelBuffer];
+
+    CVPixelBufferLockBaseAddress(pixelBuffer,0);
+      
+    unsigned char *pixels = (unsigned char *)CVPixelBufferGetBaseAddress(pixelBuffer);
+    size_t image_width = CVPixelBufferGetWidth(pixelBuffer);
+    size_t image_height = CVPixelBufferGetHeight(pixelBuffer);
+
+    totalLuminance = 0.0;
+    for(int p=0;p<image_width*image_height*4;p+=4) {
+      totalLuminance += pixels[p]*0.299 + pixels[p+1]*0.587 + pixels[p+2]*0.114;
+    }
+      
+    totalLuminance /= (image_width*image_height);
+    totalLuminance /= 255.0;
+      
+    totalLuminance = totalLuminance * 2 * 3.141592653589793;
+    //NSLog(@"Lux:%f",totalLuminance);
+
+    CVPixelBufferUnlockBaseAddress(pixelBuffer,0);
+
+    
     CVPixelBufferRef pixelBuffer = (CVPixelBufferRef)CMSampleBufferGetImageBuffer(sampleBuffer);
     CIImage *image = [CIImage imageWithCVPixelBuffer:pixelBuffer];
 
