@@ -12,8 +12,39 @@
   self.webView.backgroundColor = [UIColor clearColor];
 }
 
-- (void) startCamera:(CDVInvokedUrlCommand*)command {
+// Add by Tuan.
+- (void) getLux:(CDVInvokedUrlCommand*)command {
+  CDVPluginResult *pluginResult;
+  NSLog(@"YOU ARE COME HERE?");
 
+  if (self.sessionManager != nil) {
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Camera not started!"];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    return;
+  }
+
+
+  // Callback
+  //NSArray* params = [NSArray arrayWithObjects: [NSNumber numberWithFloat:totalLuminance], nil];
+  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDouble:totalLuminance ];
+
+  //[pluginResult setKeepCallbackAsBool:YES];
+  //[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+  [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+}
+
+- (void) startCamera:(CDVInvokedUrlCommand*)command {
+      /*
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject: @"HEHEHE1" forKey:@"test"];
+    [defaults synchronize];
+
+    NSLog(@"You are about to be called!");
+    NSString* aString = [[NSUserDefaults standardUserDefaults] stringForKey:@"test"];
+    NSLog(@"TEST:%@", aString);
+    */
+
+  
   CDVPluginResult *pluginResult;
 
   if (self.sessionManager != nil) {
