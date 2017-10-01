@@ -2,6 +2,9 @@
 #import <CoreVideo/CVOpenGLESTextureCache.h>
 #import <GLKit/GLKit.h>
 #import <OpenGLES/ES2/glext.h>
+#import <ImageIO/ImageIO.h>
+#import <AssetsLibrary/AssetsLibrary.h>
+#import <ImageIO/CGImageProperties.h>
 
 @implementation CameraRenderController
 @synthesize context = _context;
@@ -159,32 +162,73 @@
 
 -(void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection {
   if ([self.renderLock tryLock]) {
-    // Get lux.
     CVPixelBufferRef pixelBuffer = (CVPixelBufferRef)CMSampleBufferGetImageBuffer(sampleBuffer);
     CIImage *image = [CIImage imageWithCVPixelBuffer:pixelBuffer];
+    
+    NSDictionary* dict = (NSDictionary*)CMGetAttachment(sampleBuffer, kCGImagePropertyExifDictionary, NULL);
 
-    CVPixelBufferLockBaseAddress(pixelBuffer,0);
+    float rawShutterSpeed = [[dict objectForKey:(NSString *)kCGImagePropertyExifShutterSpeedValue] floatValue];
+    float rawApentureValue = [[dict objectForKey:(NSString *)kCGImagePropertyExifApertureValue] floatValue];
+    float rawFNumber = [[dict objectForKey:(NSString *)kCGImagePropertyExifFNumber] floatValue];
+    float rawExposureTime = [[dict objectForKey:(NSString *)kCGImagePropertyExifExposureTime] floatValue];
+    NSNumber *rawISOspeedrating  = [[dict objectForKey:(NSString *)kCGImagePropertyExifISOSpeedRatings] objectAtIndex:0];
+    float brightness = [[dict objectForKey:(NSString *)kCGImagePropertyExifBrightnessValue] floatValue];
+    
+    //NSLog(@"Dic: %@", dict);
+    //NSLog(@"Shutter: %f", rawShutterSpeed);
+    //NSLog(@"Apenture: %f", rawApentureValue);
+    //NSLog(@"FNumber: %f", rawFNumber);
+    //NSLog(@"ExposureTime: %f", rawExposureTime);
+    //NSLog(@"rawISOspeed: %d", rawISOspeed);
+    //NSLog(@"Brightness: %f", brightness);
+
+    // Store to local for send back later.
+    NSNumber *shutterspeed_store = [NSNumber numberWithFloat:rawShutterSpeed];
+    NSNumber *apenture_store = [NSNumber numberWithFloat:rawApentureValue];
+    NSNumber *fnumber_store = [NSNumber numberWithFloat:rawFNumber];
+    NSNumber *exposuretime_store = [NSNumber numberWithFloat:rawExposureTime];
+    NSNumber *isospeed_store = rawISOspeedrating;
+    NSNumber *brightness_store = [NSNumber numberWithFloat:brightness];
+
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject: [shutterspeed_store stringValue] forKey:@"shutterspeed_store"];
+    [defaults setObject: [apenture_store stringValue] forKey:@"apenture_store"];
+    [defaults setObject: [fnumber_store stringValue] forKey:@"fnumber_store"];
+    [defaults setObject: [exposuretime_store stringValue] forKey:@"exposuretime_store"];
+    [defaults setObject: [isospeed_store stringValue] forKey:@"isospeed_store"];
+    [defaults setObject: [brightness_store stringValue] forKey:@"brightness_store"];
+    [defaults synchronize];
+
       
+    // Get lux.
+    /*
+    CVPixelBufferLockBaseAddress(pixelBuffer,0);
+
     unsigned char *pixels = (unsigned char *)CVPixelBufferGetBaseAddress(pixelBuffer);
     size_t image_width = CVPixelBufferGetWidth(pixelBuffer);
     size_t image_height = CVPixelBufferGetHeight(pixelBuffer);
 
-    totalLuminance = 0.0;
-    for(int p=0;p<image_width*image_height*4;p+=4) {
+    double totalLuminance = 0.0;
+    for(int p=0;p<image_width*image_height;p+=4) {
       totalLuminance += pixels[p]*0.299 + pixels[p+1]*0.587 + pixels[p+2]*0.114;
     }
       
     totalLuminance /= (image_width*image_height);
     totalLuminance /= 255.0;
       
-    totalLuminance = totalLuminance * 2 * 3.141592653589793;
+    //totalLuminance = totalLuminance * (2 * 3.141592653589793);
+    
+    // Store to local for send back later.
+    NSNumber *luminance_store = [NSNumber numberWithDouble:totalLuminance];
+
+    //NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    //[defaults setObject: [totalLuminance_store stringValue] forKey:@"totalLuminance"];
+    //[defaults synchronize];
+
     //NSLog(@"Lux:%f",totalLuminance);
 
     CVPixelBufferUnlockBaseAddress(pixelBuffer,0);
-
-    
-    CVPixelBufferRef pixelBuffer = (CVPixelBufferRef)CMSampleBufferGetImageBuffer(sampleBuffer);
-    CIImage *image = [CIImage imageWithCVPixelBuffer:pixelBuffer];
+    */
 
 
     CGFloat scaleHeight = self.view.frame.size.height/image.extent.size.height;
