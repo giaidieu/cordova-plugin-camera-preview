@@ -15,36 +15,26 @@
 // Add by Tuan.
 - (void) getLux:(CDVInvokedUrlCommand*)command {
   CDVPluginResult *pluginResult;
-  NSLog(@"YOU ARE COME HERE?");
 
-  if (self.sessionManager != nil) {
-    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Camera not started!"];
+  NSString *shutterspeed_store = [[NSUserDefaults standardUserDefaults] stringForKey:@"shutterspeed_store"];
+  NSString *apenture_store = [[NSUserDefaults standardUserDefaults] stringForKey:@"apenture_store"];
+  NSString *fnumber_store = [[NSUserDefaults standardUserDefaults] stringForKey:@"fnumber_store"];
+  NSString *exposuretime_store = [[NSUserDefaults standardUserDefaults] stringForKey:@"exposuretime_store"];
+  NSString *isospeed_store = [[NSUserDefaults standardUserDefaults] stringForKey:@"isospeed_store"];
+  NSString *brightness_store = [[NSUserDefaults standardUserDefaults] stringForKey:@"brightness_store"];
+    
+  if (brightness_store == nil) {
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"EXIF metadata not found!"];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     return;
   }
 
-
   // Callback
-  //NSArray* params = [NSArray arrayWithObjects: [NSNumber numberWithFloat:totalLuminance], nil];
-  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDouble:totalLuminance ];
-
-  //[pluginResult setKeepCallbackAsBool:YES];
-  //[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-  [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: [NSString stringWithFormat:@"%@|%@|%@|%@|%@|%@", shutterspeed_store, apenture_store, fnumber_store, exposuretime_store, isospeed_store, brightness_store]];
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
-- (void) startCamera:(CDVInvokedUrlCommand*)command {
-      /*
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject: @"HEHEHE1" forKey:@"test"];
-    [defaults synchronize];
-
-    NSLog(@"You are about to be called!");
-    NSString* aString = [[NSUserDefaults standardUserDefaults] stringForKey:@"test"];
-    NSLog(@"TEST:%@", aString);
-    */
-
-  
+- (void) startCamera:(CDVInvokedUrlCommand*)command {  
   CDVPluginResult *pluginResult;
 
   if (self.sessionManager != nil) {
