@@ -10,6 +10,7 @@ function isFunction(obj) {
     return !!(obj && obj.constructor && obj.call && obj.apply);
 };
 
+// New function added by Tuan.
 CameraPreview.getLux = function(onSuccess, onError) {
     exec(onSuccess, onError, PLUGIN_NAME, "getLux");
 };
