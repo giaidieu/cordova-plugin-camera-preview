@@ -115,6 +115,29 @@
           success = FALSE;
         }
       }
+      
+      // Add by Tuan.
+      if ([videoDevice isExposureModeSupported:AVCaptureExposureModeContinuousAutoExposure]) {
+        if ([videoDevice lockForConfiguration:&error]) {
+          [videoDevice setExposureMode:AVCaptureExposureModeContinuousAutoExposure];
+          [videoDevice unlockForConfiguration];
+        }
+        else{
+          NSLog(@"%@", error);
+          success = FALSE;
+        }
+      }
+      if ([videoDevice isWhiteBalanceModeSupported:AVCaptureWhiteBalanceModeContinuousAutoWhiteBalance]) {
+          if ([videoDevice lockForConfiguration:&error]) {
+              [videoDevice setWhiteBalanceMode:AVCaptureWhiteBalanceModeContinuousAutoWhiteBalance];
+              [videoDevice unlockForConfiguration];
+          }
+          else{
+              NSLog(@"%@", error);
+              success = FALSE;
+          }
+      }
+
 
       AVCaptureDeviceInput *videoDeviceInput = [AVCaptureDeviceInput deviceInputWithDevice:videoDevice error:&error];
 
